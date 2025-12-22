@@ -46,17 +46,17 @@ async def on_incoming(msg: str):
     msg = json.loads(msg)
     # await broker.publish(msg, queue="response")
 
-    if not Path(DEST_EXCEL_PATH).exists():
-        shutil.copy2(TEMPLATE_EXCEL, DEST_EXCEL_PATH)
-
     try:
-        # await getting_data_from_ECP()
-        # await getting_hospitalisation_data()
-        # await getting_data_about_appointment_list()
+        if not Path(DEST_EXCEL_PATH).exists():
+            shutil.copy2(TEMPLATE_EXCEL, DEST_EXCEL_PATH)
 
-        proccess_ECP_data()
-        proccess_islo_hospitalisation_data()
-        proccess_islo_appointment_list_data()
+            await getting_data_from_ECP()
+            await getting_hospitalisation_data()
+            await getting_data_about_appointment_list()
+
+            proccess_ECP_data()
+            proccess_islo_hospitalisation_data()
+            proccess_islo_appointment_list_data()
 
         with open(DEST_EXCEL_PATH, "rb") as f:
             file_bytes = f.read()
