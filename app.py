@@ -183,7 +183,7 @@ async def getting_data_from_ECP():
             await page.locator('[id="rpt.engine.paramLpuBuilding"] + *').click()
             await page.locator('[id="rpt.engine.paramLpuBuilding"]').type(title)
 
-            page.locator(
+            await page.locator(
                 "div.x-combo-list-item.x-combo-selected", has_text=title
             ).click()
 
@@ -195,7 +195,7 @@ async def getting_data_from_ECP():
             await page.get_by_text("Формат XLSX").click()
             await page.get_by_text("Сформировать отчет").click()
 
-            async with page.expect_download(timeout=60000) as download_info:
+            async with page.expect_download(timeout=90000) as download_info:
                 await page.get_by_text("Сформировать отчет").click()
 
                 download = await download_info.value
