@@ -31,6 +31,14 @@ class Consts(BaseSettings):
     @property
     def WEEK_AGO(self) -> str:
         return (datetime.date.today() - timedelta(days=7)).strftime("%d.%m.%Y")
+    
+    @property
+    def DEST_EXCEL_TITLE(self):
+        return f"Отчет по ИС ЛО с {self.WEEK_AGO} по {self.YESTERDAY}.xlsx"
+    
+    @property
+    def DEST_EXCEL_PATH(self):
+        return f"reports/{self.DEST_EXCEL_TITLE}"
 
     model_config = SettingsConfigDict(env_file=".env")
 

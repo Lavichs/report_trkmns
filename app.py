@@ -31,8 +31,6 @@ logger = logging.getLogger("uvicorn")
 locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
 UPLOADS_PATH = Path("uploads")
 TEMPLATE_EXCEL = "Template.xlsx"
-DEST_EXCEL_TITLE = f"Отчет по ИС ЛО с {consts.WEEK_AGO} по {consts.YESTERDAY}.xlsx"
-DEST_EXCEL_PATH = f"reports/{DEST_EXCEL_TITLE}"
 
 
 # Определить функцию-потребителя
@@ -47,8 +45,8 @@ async def on_incoming(msg: str):
     # await broker.publish(msg, queue="response")
 
     try:
-        if not Path(DEST_EXCEL_PATH).exists():
-            shutil.copy2(TEMPLATE_EXCEL, DEST_EXCEL_PATH)
+        if not Path(consts.DEST_EXCEL_PATH).exists():
+            shutil.copy2(TEMPLATE_EXCEL, consts.DEST_EXCEL_PATH)
 
             await getting_data_from_ECP()
             await getting_hospitalisation_data()
@@ -58,7 +56,7 @@ async def on_incoming(msg: str):
             proccess_islo_hospitalisation_data()
             proccess_islo_appointment_list_data()
 
-        with open(DEST_EXCEL_PATH, "rb") as f:
+        with open(consts.DEST_EXCEL_PATH, "rb") as f:
             file_bytes = f.read()
 
         file_base64 = base64.b64encode(file_bytes).decode('utf-8')
@@ -66,7 +64,7 @@ async def on_incoming(msg: str):
         # попытка выполнить скрипт
         msg['text'] = 'Скрипт отработал успешно'
         msg['content'] = file_base64
-        msg['filename'] = DEST_EXCEL_TITLE
+        msg['filename'] = consts.DEST_EXCEL_TITLE
         await broker.publish(json.dumps(msg), queue="response")
     except Exception as e:
         logger.error(e)
@@ -94,8 +92,8 @@ def get_report(background_tasks: BackgroundTasks):
     # await getting_hospitalisation_data()
     # await getting_data_about_appointment_list()
 
-    if not Path(DEST_EXCEL_PATH).exists():
-        shutil.copy2(TEMPLATE_EXCEL, DEST_EXCEL_PATH)
+    if not Path(consts.DEST_EXCEL_PATH).exists():
+        shutil.copy2(TEMPLATE_EXCEL, consts.DEST_EXCEL_PATH)
 
         # getting data
         # await getting_data_from_ECP()
@@ -110,14 +108,14 @@ def get_report(background_tasks: BackgroundTasks):
     return {'data': "Tasks start"}
 
     # return FileResponse(
-    #     path=DEST_EXCEL_PATH,
-    #     filename=DEST_EXCEL_TITLE,
+    #     path=consts.DEST_EXCEL_PATH,
+    #     filename=consts.DEST_EXCEL_TITLE,
     #     media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     # )
 
 
 def add_data_to_dest_excel(data: list, row: int):
-    wb_dest = load_workbook(DEST_EXCEL_PATH)
+    wb_dest = load_workbook(consts.DEST_EXCEL_PATH)
     ws_dest = wb_dest.active
     i = 2
 
@@ -127,7 +125,7 @@ def add_data_to_dest_excel(data: list, row: int):
 
     ws_dest.cell(row=10, column=1).value = f"{consts.WEEK_AGO} - {consts.YESTERDAY}"
 
-    wb_dest.save(DEST_EXCEL_PATH)
+    wb_dest.save(consts.DEST_EXCEL_PATH)
 
 
 async def getting_data_from_ECP():
